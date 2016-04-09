@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Net.Http.Client;
 
 namespace Docker.DotNet
 {
@@ -50,7 +51,15 @@ namespace Docker.DotNet
             Containers = new ContainerOperations(this);
             Miscellaneous = new MiscellaneousOperations(this);
 
-            _client = new HttpClient(Configuration.Credentials.Handler, false);
+            var handler = new ManagedHandler();
+            /*async () =>
+            {
+                var stream = new System.IO.Pipes.NamedPipeClientStream("docker_engine");
+                await stream.ConnectAsync();
+                return stream;
+            });*/
+
+            _client = new HttpClient(Configuration.Credentials.GetHandler(handler), true);
 
             _defaultTimeout = _client.Timeout;
 

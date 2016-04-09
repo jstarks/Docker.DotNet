@@ -1,24 +1,14 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading;
+using Microsoft.Net.Http.Client;
 
 namespace Docker.DotNet
 {
     public class AnonymousCredentials : Credentials
     {
-        private readonly HttpClientHandler _handler;
-
         public AnonymousCredentials()
         {
-            _handler = new HttpClientHandler();
-        }
-
-        public override HttpMessageHandler Handler
-        {
-            get
-            {
-                return _handler;
-            }
         }
 
         public override bool IsTlsCredentials()
@@ -28,7 +18,11 @@ namespace Docker.DotNet
 
         public override void Dispose()
         {
-            _handler.Dispose();
+        }
+
+        public override HttpMessageHandler GetHandler(HttpMessageHandler innerHandler)
+        {
+            return innerHandler;
         }
     }
 }
