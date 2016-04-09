@@ -5,25 +5,27 @@ namespace Docker.DotNet.X509
 {
     public class CertificateCredentials : Credentials
     {
-        private readonly WebRequestHandler _handler;
+        private X509Certificate2 _certificate;
 
         public CertificateCredentials(X509Certificate2 clientCertificate)
         {
-            _handler = new WebRequestHandler()
+            _certificate = clientCertificate;
+        }
+
+        public override HttpMessageHandler GetHandler(HttpMessageHandler innerHandler)
+        {
+            // Until the inner handle supports client certificates, just ignore it and
+            // use a WebRequestHandler.
+            innerHandler.Dispose();
+
+            var handler = new WebRequestHandler()
             {
                 ClientCertificateOptions = ClientCertificateOption.Manual,
                 UseDefaultCredentials = false
             };
 
-            _handler.ClientCertificates.Add(clientCertificate);
-        }
-
-        public override HttpMessageHandler Handler
-        {
-            get
-            {
-                return _handler;
-            }
+            handler.ClientCertificates.Add(_certificate);
+            return handler;
         }
 
         public override bool IsTlsCredentials()
@@ -33,7 +35,6 @@ namespace Docker.DotNet.X509
 
         public override void Dispose()
         {
-            _handler.Dispose();
         }
     }
 }

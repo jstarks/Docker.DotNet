@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Net.Http.Client;
 
 namespace Docker.DotNet
 {
@@ -53,7 +54,22 @@ namespace Docker.DotNet
             Miscellaneous = new MiscellaneousOperations(this);
             Networks = new NetworkOperations(this);
 
-            _client = new HttpClient(Configuration.Credentials.Handler, false);
+            ManagedHandler handler;
+            if (configuration.EndpointBaseUri.Scheme == "npipe")
+            {
+                handler = new ManagedHandler(async (string host, int port) =>
+                {
+                    var stream = new System.IO.Pipes.NamedPipeClientStream(configuration.EndpointBaseUri.AbsolutePath);
+                    await stream.ConnectAsync();
+                    return stream;
+                });
+            }
+            else
+            {
+                handler = new ManagedHandler();
+            }
+
+            _client = new HttpClient(Configuration.Credentials.GetHandler(handler), true);
 
             _defaultTimeout = _client.Timeout;
 
