@@ -57,10 +57,12 @@ namespace Docker.DotNet
             ManagedHandler handler;
             if (configuration.EndpointBaseUri.Scheme == "npipe")
             {
-                handler = new ManagedHandler(async (string host, int port) =>
+                handler = new ManagedHandler(async (string host, int port, CancellationToken cancellationToken) =>
                 {
+                    // NamedPipeClientStream handles file not found extremely poorly -- it spins! Use a short timeout 
+                    // in case we fall into this path.
                     var stream = new System.IO.Pipes.NamedPipeClientStream(configuration.EndpointBaseUri.AbsolutePath);
-                    await stream.ConnectAsync();
+                    await stream.ConnectAsync(cancellationToken);
                     return stream;
                 });
             }

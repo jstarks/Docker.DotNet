@@ -13,6 +13,12 @@ namespace Docker.DotNet
             }
 
             UriBuilder builder = new UriBuilder(baseUri);
+            
+            // Normalize the scheme so that HttpClient does not complain.
+            if (builder.Scheme != "https")
+            {
+                builder.Scheme = "http";
+            }
 
             if (requestedApiVersion != null)
             {

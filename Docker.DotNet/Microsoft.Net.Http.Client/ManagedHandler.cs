@@ -17,7 +17,7 @@ namespace Microsoft.Net.Http.Client
         {
         }
 
-        public delegate Task<Stream> StreamOpener(string host, int port);
+        public delegate Task<Stream> StreamOpener(string host, int port, CancellationToken cancellationToken);
 
         public ManagedHandler(StreamOpener opener)
         {
@@ -260,7 +260,7 @@ namespace Microsoft.Net.Http.Client
             return ProxyMode.Tunnel;
         }
 
-        private static async Task<Stream> TCPStreamOpener(string host, int port)
+        private static async Task<Stream> TCPStreamOpener(string host, int port, CancellationToken cancellationToken)
         {
             TcpClient client = new TcpClient();
             try
@@ -279,7 +279,7 @@ namespace Microsoft.Net.Http.Client
         {
             try
             {
-                return await _opener(request.GetConnectionHostProperty(), request.GetConnectionPortProperty().Value);
+                return await _opener(request.GetConnectionHostProperty(), request.GetConnectionPortProperty().Value, cancellationToken);
             }
             catch (SocketException sox)
             {
