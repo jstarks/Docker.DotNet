@@ -1,6 +1,10 @@
 ﻿{
     "version": "0.1.0",
     "dependencies": {},
+    "runtimes": {
+        "win10-x64": {},
+        "win10-x86": {}
+    },
     "frameworks": {
         "netstandard1.3": {
             "imports": [
@@ -17,6 +21,12 @@
                 "System.Security.Principal": "4.0.0",
                 "System.Text.Encoding": "4.0.10",
                 "System.Threading.Tasks": "4.0.10"
+            }
+        },
+        "net45": {
+            "frameworkAssemblies": {
+                "System.Net.Http": "",
+                "System.Runtime.Serialization": ""
             }
         }
     }

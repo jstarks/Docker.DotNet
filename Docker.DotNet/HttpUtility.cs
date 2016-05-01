@@ -13,7 +13,7 @@ namespace Docker.DotNet
             }
 
             UriBuilder builder = new UriBuilder(baseUri);
-            
+
             // Normalize the scheme so that HttpClient does not complain.
             if (builder.Scheme != "https")
             {
