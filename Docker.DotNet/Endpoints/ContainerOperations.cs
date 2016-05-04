@@ -28,6 +28,14 @@ namespace Docker.DotNet
             this.Client = client;
         }
 
+        public async Task<Stream> AttachContainerAsync(string id, ContainerAttachParameters parameters, CancellationToken cancellationToken)
+        {
+            var path = $"containers/{id}/attach";
+            var queryParameters = new QueryString<ContainerAttachParameters>(parameters);
+            var stream = await this.Client.MakeRequestForStreamAsync(new[] {NoSuchContainerHandler}, HttpMethod.Post, path, queryParameters, null, cancellationToken).ConfigureAwait(false);
+            return stream;
+        }
+
         public async Task<IList<ContainerListResponse>> ListContainersAsync(ContainersListParameters parameters)
         {
             if (parameters == null)
