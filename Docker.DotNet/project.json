@@ -1,8 +1,7 @@
 {
   "version": "2.124.0",
   "dependencies": {
-    "Newtonsoft.Json": "8.0.3",
-    "Microsoft.Net.Http.Client": "0.1.0"
+    "Newtonsoft.Json": "8.0.3"
   },
   "runtimes": {
     "win10-x64": {},

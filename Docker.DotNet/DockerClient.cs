@@ -27,7 +27,7 @@ namespace Docker.DotNet
         public IContainerOperations Containers { get; private set; }
 
         public IMiscellaneousOperations Miscellaneous { get; private set; }
-        
+
         public INetworkOperations Networks { get; private set; }
 
         private readonly ApiResponseErrorHandlingDelegate _defaultErrorHandlingDelegate = (statusCode, body) =>
@@ -59,10 +59,15 @@ namespace Docker.DotNet
             {
                 handler = new ManagedHandler(async (string host, int port, CancellationToken cancellationToken) =>
                 {
-                    // NamedPipeClientStream handles file not found extremely poorly -- it spins! Use a short timeout 
-                    // in case we fall into this path.
+                    // NamedPipeClientStream handles file not found by polling until the server arrives. Use a short
+                    // timeout so that the user doesn't get stuck waiting for a dockerd instance that is not running.
+                    int timeout = 100; // 100ms
                     var stream = new System.IO.Pipes.NamedPipeClientStream(configuration.EndpointBaseUri.AbsolutePath);
-                    await stream.ConnectAsync(cancellationToken);
+#if NET45
+                    await Task.Run(() => stream.Connect(timeout), cancellationToken);
+#else
+                    await stream.ConnectAsync(timeout, cancellationToken);
+#endif
                     return stream;
                 });
             }
