@@ -1,5 +1,7 @@
-﻿using System.Net.Http;
+﻿using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.Net.Http.Client;
 
 namespace Docker.DotNet.X509
 {
@@ -14,17 +16,13 @@ namespace Docker.DotNet.X509
 
         public override HttpMessageHandler GetHandler(HttpMessageHandler innerHandler)
         {
-            // Until the inner handle supports client certificates, just ignore it and
-            // use a WebRequestHandler.
-            innerHandler.Dispose();
-
-            var handler = new WebRequestHandler()
+            var handler = (ManagedHandler)innerHandler;
+            handler.ClientCertificates = new X509CertificateCollection
             {
-                ClientCertificateOptions = ClientCertificateOption.Manual,
-                UseDefaultCredentials = false
+                _certificate
             };
 
-            handler.ClientCertificates.Add(_certificate);
+            handler.ServerCertificateValidationCallback = ServicePointManager.ServerCertificateValidationCallback;
             return handler;
         }
 
